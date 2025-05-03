@@ -11,7 +11,7 @@ data object LogUtil {
     internal const val FILE_NAME = "LogUtil.kt"
     internal const val METHOD_NAME = "logDeep"
 
-    var minLogLevel: LogLevel = LogLevel.DEBUG
+    var minLogLevel: LogLevel = LogLevel.ERROR
     val tag: String = DEFAULT_TAG
 }
 
