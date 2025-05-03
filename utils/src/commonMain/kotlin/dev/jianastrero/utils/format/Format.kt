@@ -13,7 +13,7 @@ fun String.format(
         string = string.replaceRange(index, index + STRING_FORMAT.length, arg.toString())
     }
 
-    return string
+    return string.formatEmpty()
 }
 
 fun String.formatEmpty(): String {
