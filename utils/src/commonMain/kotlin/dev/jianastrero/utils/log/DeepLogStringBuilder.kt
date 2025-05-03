@@ -2,8 +2,6 @@ package dev.jianastrero.utils.log
 
 import dev.jianastrero.utils.format.format
 import dev.jianastrero.utils.format.formatEmpty
-import dev.jianastrero.utils.println
-import kotlin.math.max
 
 internal class DeepLogStringBuilder {
     var caller: String = ""
@@ -14,9 +12,21 @@ internal class DeepLogStringBuilder {
     var properties: List<Triple<String, String, Any?>> = emptyList()
 
     companion object {
-        const val HEADER_FORMAT = "| %s [%s]%s |"
-        const val PROPERTY_FORMAT = "| %s | %s | %s |"
-        const val VALUE_FORMAT = "| %s | %s |"
+        const val HEADER_FORMAT = " %s [%s]%s "
+        const val PROPERTY_FORMAT = " %s │ %s │ %s "
+        const val VALUE_FORMAT = " %s │ %s "
+
+        const val BOX_TOP        = "┏%s┓"
+        const val BOX_MID        = "┃%s┃"
+        const val BOX_BOTTOM     = "┗%s┛"
+        const val BOX_HR         = "┣%s┫"
+        const val BOX_HORIZONTAL = "━"
+
+        const val THIN_BOX_TOP        = "┌%s┐"
+        const val THIN_BOX_MID        = "│%s│"
+        const val THIN_BOX_BOTTOM     = "└%s┘"
+        const val THIN_HR             = "├%s┤"
+        const val THIN_BOX_HORIZONTAL = "─"
     }
 }
 
@@ -49,86 +59,137 @@ internal fun deepLog(block: DeepLogStringBuilder.() -> Unit): String {
     val valueFormatLength = DeepLogStringBuilder.VALUE_FORMAT.formatEmpty().length
     val valueLength = "value".length + valueString.length + valueFormatLength
 
-    val totalLength = maxOf(headerLength, propertyLength, valueLength)
+    val callStackStringList = callStack.mapIndexed { index, stack ->
+        "${" ".repeat(index + 1)}↳ $stack "
+    }
+    val maxCallStackLength = callStackStringList.maxOfOrNull { it.length } ?: 0
+
+    val tableLength = maxOf(headerLength, propertyLength, valueLength)
+    val boxLength = maxOf(tableLength, maxCallStackLength, builder.caller.length)
+
+    val headerText = header(name = name, className = className, formatLength = headerFormatLength, tableLength = tableLength)
 
     return StringBuilder()
-        .appendLine(builder.caller)
-        .hr(totalLength)
-        .header(name, className, totalLength, headerFormatLength)
-        .hr(totalLength)
+        .appendLine(boxTop(boxLength))
+        .appendLine(boxMid(value = builder.caller, length = boxLength))
+        .appendLine(boxMid(value = thinBoxTop(tableLength), length = boxLength))
+        .appendLine(boxMid(value = thinBoxMid(value = headerText, length = tableLength), length = boxLength))
+        .appendLine(boxMid(value = thinHR(tableLength), length = boxLength))
         .apply {
             if (properties.isEmpty()) {
-                value("value", valueString, totalLength, valueFormatLength)
+                val valueText = value(
+                    propertyValue = valueString,
+                    tableLength = tableLength,
+                    formatLength = valueFormatLength
+                )
+                appendLine(
+                    boxMid(value = thinBoxMid(value = valueText, length = tableLength), length = boxLength))
             } else {
                 properties.forEach { (propertyName, propertyClass, propertyValue) ->
-                    property(propertyName, propertyClass, propertyValue, maxNameLength, maxClassLength, maxValueLength)
+                    val propertyText = property(
+                        propertyName = propertyName,
+                        propertyClass = propertyClass,
+                        propertyValue = propertyValue,
+                        maxNameLength = maxNameLength,
+                        maxClassLength = maxClassLength,
+                        maxValueLength = maxValueLength
+                    )
+                    appendLine(
+                        boxMid(value = thinBoxMid(value = propertyText, length = tableLength), length = boxLength)
+                    )
                 }
             }
         }
-        .hr(totalLength)
+        .appendLine(boxMid(value = thinBoxBottom(length = tableLength), length = boxLength))
+        .appendLine(boxHR(boxLength))
         .apply {
-            callStack.forEachIndexed { index, stack ->
-                appendLine("${" ".repeat(index + 1)}↳ $stack")
-            }
+            callStackStringList.forEach { appendLine(boxMid(it, boxLength)) }
         }
+        .appendLine(boxBottom(boxLength))
         .toString()
         .trim()
 }
 
-private fun StringBuilder.hr(length: Int): StringBuilder {
-    return appendLine("-".repeat(length))
+private fun boxTop(length: Int): String {
+    return DeepLogStringBuilder.BOX_TOP.format(DeepLogStringBuilder.BOX_HORIZONTAL.repeat(length))
 }
 
-private fun StringBuilder.header(
+private fun boxBottom(length: Int): String {
+    return DeepLogStringBuilder.BOX_BOTTOM.format(DeepLogStringBuilder.BOX_HORIZONTAL.repeat(length))
+}
+
+private fun boxMid(value: String, length: Int): String {
+    val padding = " ".repeat(length - value.length)
+    return DeepLogStringBuilder.BOX_MID.format("$value$padding")
+}
+
+private fun boxHR(length: Int): String {
+    return DeepLogStringBuilder.BOX_HR.format(DeepLogStringBuilder.BOX_HORIZONTAL.repeat(length))
+}
+
+private fun thinBoxTop(length: Int): String {
+    return DeepLogStringBuilder.THIN_BOX_TOP.format(DeepLogStringBuilder.THIN_BOX_HORIZONTAL.repeat(length))
+}
+
+private fun thinBoxBottom(length: Int): String {
+    return DeepLogStringBuilder.THIN_BOX_BOTTOM.format(DeepLogStringBuilder.THIN_BOX_HORIZONTAL.repeat(length))
+}
+
+private fun thinBoxMid(
+    value: String,
+    length: Int,
+): String {
+    val padding = " ".repeat(length - value.length)
+    return DeepLogStringBuilder.THIN_BOX_MID.format("$value$padding")
+}
+
+private fun thinHR(length: Int): String {
+    return DeepLogStringBuilder.THIN_HR.format(DeepLogStringBuilder.THIN_BOX_HORIZONTAL.repeat(length))
+}
+
+private fun header(
     name: String,
     className: String,
-    totalLength: Int,
     formatLength: Int,
-): StringBuilder {
-    val padding = " ".repeat(totalLength - name.length - className.length - formatLength)
+    tableLength: Int,
+): String {
+    val padding = " ".repeat(tableLength - name.length - className.length - formatLength)
 
-    return appendLine(
-        DeepLogStringBuilder.HEADER_FORMAT.format(
-            name,
-            className,
-            padding
-        ).formatEmpty()
+    return DeepLogStringBuilder.HEADER_FORMAT.format(
+        name,
+        className,
+        padding
     )
 }
 
-private fun StringBuilder.value(
-    propertyName: String,
+private fun value(
     propertyValue: String,
-    totalLength: Int,
+    tableLength: Int,
     formatLength: Int,
-): StringBuilder {
-    val padding = " ".repeat(totalLength - propertyName.length - propertyValue.length - formatLength)
+): String {
+    val padding = " ".repeat(tableLength - "value".length - propertyValue.length - formatLength)
 
-    return appendLine(
-        DeepLogStringBuilder.VALUE_FORMAT.format(
-            propertyName,
-            "$propertyValue$padding"
-        ).formatEmpty()
+    return DeepLogStringBuilder.VALUE_FORMAT.format(
+        "value",
+        "$propertyValue$padding"
     )
 }
 
-private fun StringBuilder.property(
+private fun property(
     propertyName: String,
     propertyClass: String,
     propertyValue: Any?,
     maxNameLength: Int,
     maxClassLength: Int,
     maxValueLength: Int,
-): StringBuilder {
+): String {
     val namePadding = " ".repeat(maxNameLength - propertyName.length)
     val classPadding = " ".repeat(maxClassLength - propertyClass.length)
     val valuePadding = " ".repeat(maxValueLength - propertyValue.toString().length)
 
-    return appendLine(
-        DeepLogStringBuilder.PROPERTY_FORMAT.format(
-            "$propertyName$namePadding",
-            "$propertyClass$classPadding",
-            "$propertyValue$valuePadding"
-        ).formatEmpty()
+    return DeepLogStringBuilder.PROPERTY_FORMAT.format(
+        "$propertyName$namePadding",
+        "$propertyClass$classPadding",
+        "$propertyValue$valuePadding"
     )
 }
