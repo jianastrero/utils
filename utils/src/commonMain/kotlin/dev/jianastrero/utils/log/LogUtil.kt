@@ -4,7 +4,6 @@ import dev.jianastrero.utils.println
 import dev.jianastrero.utils.reflect.getProperties
 import dev.jianastrero.utils.trace.getCaller
 import dev.jianastrero.utils.trace.getStackTrace
-import kotlin.math.max
 
 data object LogUtil {
     private const val DEFAULT_TAG = "JIANDDEBUG"
@@ -47,63 +46,20 @@ fun <T> T.logDeep(name: String, tag: String = LogUtil.tag, level: LogLevel = Log
     val kClass = this::class
     val caller = getCaller()
     val className = kClass.qualifiedName ?: "Unknown Class"
-    val propertiesList = runCatching { this.getProperties() }
-        .getOrElse { exception ->
-            exception.log(name, level)
-            null
-        }?.map { (propertyName, property) ->
-            val (propertyClass, propertyValue) = property
-            Triple(
-                propertyName,
-                propertyClass,
-                propertyValue
-            )
-        }
-    val callStack = runCatching { getStackTrace() }
-        .getOrElse { exception ->
-            exception.log(name, level)
-            null
-        }
+    val propertiesList = getPropertyList(name = name, level = level)
+    val callStack = getCallStack(name = name, level = level)
 
-    val logMessage = StringBuilder()
-        .appendLine()
-        .appendLine(caller)
-        .apply {
-            val maxNameLength = propertiesList?.maxOfOrNull { it.first.length } ?: 0
-            val maxClassLength = propertiesList?.maxOfOrNull { it.second.length } ?: 0
-            val maxValueLength = propertiesList?.maxOfOrNull { it.third.toString().length } ?: 0
-            val headerLength = name.length + className.length + "|  () |".length
-
-            val stringLength = maxNameLength + maxClassLength + maxValueLength
-            val totalLength = max(headerLength, stringLength + "|  |  |  |".length)
-
-            hr(totalLength)
-            header("$name ($className)", totalLength)
-            hr(totalLength)
-
-            if (propertiesList == null || propertiesList.isEmpty()) {
-                value("value | ${this@logDeep}", totalLength)
-            } else {
-                propertiesList.forEach { (propertyName, propertyClass, propertyValue) ->
-                    val namePadding = " ".repeat(maxNameLength - propertyName.length)
-                    val classPadding = " ".repeat(maxClassLength - propertyClass.length)
-                    val valuePadding = " ".repeat(maxValueLength - propertyValue.toString().length)
-                    appendLine("| $propertyName$namePadding | $propertyClass$classPadding | $propertyValue$valuePadding |")
-                }
-            }
-            hr(totalLength)
-        }
-        .appendLine("Call Stack:")
-        .apply {
-            callStack?.forEachIndexed { index, stack ->
-                appendLine("${" ".repeat(index + 1)}↳ $stack")
-            }
-        }
-        .toString()
-        .trim()
+    val logMessage = deepLog {
+        this.name = name
+        this.className = className
+        this.caller = caller
+        this.value = this@logDeep
+        this.properties = propertiesList ?: emptyList()
+        this.callStack = callStack ?: emptyList()
+    }
 
     println(
-        message = logMessage,
+        message = "\n$logMessage",
         tag = tag,
         level = level,
     )
@@ -111,22 +67,27 @@ fun <T> T.logDeep(name: String, tag: String = LogUtil.tag, level: LogLevel = Log
     return this
 }
 
-private fun StringBuilder.hr(length: Int): StringBuilder {
-    return appendLine("-".repeat(length))
-}
+private inline fun <reified T> T.getPropertyList(
+    name: String,
+    level: LogLevel
+): List<Triple<String, String, Any?>>? = runCatching { this?.getProperties() }
+    .getOrElse { exception ->
+        exception.log(name, level)
+        null
+    }?.map { (propertyName, property) ->
+        val (propertyClass, propertyValue) = property
+        Triple(
+            propertyName,
+            propertyClass,
+            propertyValue
+        )
+    }
 
-private fun StringBuilder.header(
-    text: String,
-    length: Int
-): StringBuilder {
-    val padding = " ".repeat(length - text.length - "|  |".length)
-    return appendLine("| $text$padding |")
-}
-
-private fun StringBuilder.value(
-    text: String,
-    length: Int
-): StringBuilder {
-    val padding = " ".repeat(length - text.length - "|  |".length)
-    return appendLine("| $text$padding |")
-}
+private inline fun <reified T> T.getCallStack(
+    name: String,
+    level: LogLevel
+) = runCatching { getStackTrace() }
+    .getOrElse { exception ->
+        exception.log(name, level)
+        null
+    }
