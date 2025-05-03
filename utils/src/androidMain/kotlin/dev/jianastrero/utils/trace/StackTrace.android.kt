@@ -2,24 +2,23 @@ package dev.jianastrero.utils.trace
 
 import dev.jianastrero.utils.log.LogUtil
 
-@Throws(exceptionClasses = [IllegalStateException::class])
+@Throws(IllegalStateException::class)
 actual fun getStackTrace(): List<String> {
     val stackTrace = Thread.currentThread().stackTrace
     val importantStackTrace = mutableListOf<String>()
+    val top = stackTrace.indexOfLast { it.className == LogUtil.QUALIFIED_CLASS_NAME } + 1
 
-    var foundTop = false
-    stackTrace.forEach { element ->
-        if (!foundTop) {
-            if (element.fileName == LogUtil.FILE_NAME && element.methodName == LogUtil.METHOD_NAME) foundTop = true
-            else return@forEach
+    stackTrace.forEachIndexed { index, element ->
+        if (index < top) {
+            return@forEachIndexed
         }
 
         val className = element.className
         val methodName = element.methodName
         val fileName = element.fileName
-        val lineNumber = element.lineNumber
+        val lineNumber = element.lineNumber.coerceIn(0, Int.MAX_VALUE)
 
-        importantStackTrace.add("$fileName → $className → $methodName → $lineNumber")
+        importantStackTrace.add("$fileName → $className → $methodName → line $lineNumber")
     }
 
     return importantStackTrace
@@ -28,17 +27,15 @@ actual fun getStackTrace(): List<String> {
 @Throws(exceptionClasses = [IllegalStateException::class])
 actual fun getCaller(): String {
     val stackTrace = Thread.currentThread().stackTrace
-    val getTop = stackTrace.indexOfFirst { element ->
-        element.fileName == LogUtil.FILE_NAME && element.methodName == LogUtil.METHOD_NAME
-    } + 1
+    val top = stackTrace.indexOfLast { it.className == LogUtil.QUALIFIED_CLASS_NAME } + 1
 
-    val caller = stackTrace.getOrNull(getTop)
+    val caller = stackTrace.getOrNull(top)
         ?: return "Unknown File → Unknown Class → Unknown Function → Unknown Line Number"
 
+    val fileName = caller.fileName
     val className = caller.className
     val methodName = caller.methodName
-    val fileName = caller.fileName
-    val lineNumber = caller.lineNumber
+    val lineNumber = caller.lineNumber.coerceIn(0, Int.MAX_VALUE)
 
-    return "$fileName → $className → $methodName → $lineNumber"
+    return "$fileName → $className → $methodName → line $lineNumber"
 }
