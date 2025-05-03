@@ -12,7 +12,7 @@ data object LogUtil {
     internal const val METHOD_NAME = "logDeep"
 
     var minLogLevel: LogLevel = LogLevel.ERROR
-    val tag: String = DEFAULT_TAG
+    var tag: String = DEFAULT_TAG
 }
 
 fun <T> T.log(
