@@ -27,5 +27,18 @@ actual fun getStackTrace(): List<String> {
 
 @Throws(exceptionClasses = [IllegalStateException::class])
 actual fun getCaller(): String {
-    TODO("Not yet implemented")
+    val stackTrace = Thread.currentThread().stackTrace
+    val getTop = stackTrace.indexOfFirst { element ->
+        element.fileName == LogUtil.FILE_NAME && element.methodName == LogUtil.METHOD_NAME
+    } + 1
+
+    val caller = stackTrace.getOrNull(getTop)
+        ?: return "Unknown File → Unknown Class → Unknown Function → Unknown Line Number"
+
+    val className = caller.className
+    val methodName = caller.methodName
+    val fileName = caller.fileName
+    val lineNumber = caller.lineNumber
+
+    return "$fileName → $className → $methodName → $lineNumber"
 }
