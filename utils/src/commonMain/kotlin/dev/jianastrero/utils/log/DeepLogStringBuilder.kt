@@ -1,7 +1,5 @@
 package dev.jianastrero.utils.log
 
-import dev.jianastrero.utils.format.format
-import dev.jianastrero.utils.format.formatEmpty
 import dev.jianastrero.utils.table.table
 
 internal class DeepLogStringBuilder {
@@ -11,25 +9,6 @@ internal class DeepLogStringBuilder {
     var callStack: List<String> = emptyList()
     var value: Any? = null
     var properties: List<Triple<String, String, Any?>> = emptyList()
-
-    companion object {
-        const val HEADER_FORMAT = " %s [%s]%s "
-        const val PROPERTY_FORMAT = " %s │ %s │ %s "
-        const val VALUE_FORMAT = " %s │ %s "
-
-        const val BOX_TOP        = "┏%s┓"
-        const val BOX_MID        = "┃%s┃"
-        const val BOX_BOTTOM     = "┗%s┛"
-        const val BOX_HR         = "┣%s┫"
-        const val BOX_HORIZONTAL = "━"
-
-        const val THIN_BOX_TOP        = "┌%s┐"
-        const val THIN_BOX_MID        = "│%s│"
-        const val THIN_BOX_BOTTOM     = "└%s┘"
-        const val THIN_HR             = "├%s┤"
-        const val THIN_BOX_HORIZONTAL = "─"
-        const val THIN_BOX_HORIZONTAL_DOWN = "┬"
-    }
 }
 
 private const val CLASS_STRING = "kotlin.String"
