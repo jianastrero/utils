@@ -1,6 +1,7 @@
 package dev.jianastrero.utils.log
 
 import dev.jianastrero.utils.ext.splitLines
+import dev.jianastrero.utils.table.TableBuilder
 import dev.jianastrero.utils.table.TableTokens
 import dev.jianastrero.utils.table.table
 
@@ -74,41 +75,35 @@ internal fun deepLog(block: DeepLogStringBuilder.() -> Unit): String {
             cell("$name [$className]", 3)
         }
 
-        if (value is Array<*>) {
-            value.forEachIndexed { index, item ->
-                item {
-                    cell("$name[$index]")
-                    cell(item.toString())
-                    cell(item?.let { it::class.qualifiedName } ?: "Unknown Class")
+        when {
+            value is Array<*> -> {
+                value.forEachIndexed { index, item ->
+                    collection(name = name, item = item, index = index)
                 }
             }
-        } else if (value is Iterable<*>) {
-            value.forEachIndexed { index, item ->
-                item {
-                    cell("$name[$index]")
-                    cell(item.toString())
-                    cell(item?.let { it::class.qualifiedName } ?: "Unknown Class")
+            value is Iterable<*> -> {
+                value.forEachIndexed { index, item ->
+                    collection(name = name, item = item, index = index)
                 }
             }
-        } else if (value is Map<*, *>) {
-            value.forEach { (key, item) ->
-                item {
-                    cell("$name[$key]")
-                    cell(item.toString())
-                    cell(item?.let { it::class.qualifiedName } ?: "Unknown Class")
+            value is Map<*, *> -> {
+                value.forEach { (key, item) ->
+                    collection(name = name, item = item, index = key)
                 }
             }
-        } else if (properties.isEmpty()) {
-            item {
-                cell("value", 1)
-                cell(valueString, 2)
-            }
-        } else {
-            properties.forEach { (propertyName, propertyClass, propertyValue) ->
+            properties.isEmpty() -> {
                 item {
-                    cell(propertyName)
-                    cell(propertyClass)
-                    cell(propertyValue.toString())
+                    cell("value", 1)
+                    cell(valueString, 2)
+                }
+            }
+            else -> {
+                properties.forEach { (propertyName, propertyClass, propertyValue) ->
+                    item {
+                        cell(propertyName)
+                        cell(propertyClass)
+                        cell(propertyValue.toString())
+                    }
                 }
             }
         }
@@ -131,4 +126,16 @@ internal fun deepLog(block: DeepLogStringBuilder.() -> Unit): String {
     }
 
     return outerTable
+}
+
+private fun TableBuilder.collection(
+    name: String,
+    item: Any?,
+    index: Any?,
+) {
+    item {
+        cell("$name[$index]")
+        cell(item.toString())
+        cell(item?.let { it::class.qualifiedName } ?: "Unknown Class")
+    }
 }
