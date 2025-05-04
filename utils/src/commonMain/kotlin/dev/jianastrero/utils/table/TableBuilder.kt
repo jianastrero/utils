@@ -1,6 +1,7 @@
 package dev.jianastrero.utils.table
 
 import dev.jianastrero.utils.ext.fillAround
+import dev.jianastrero.utils.ext.orZero
 import dev.jianastrero.utils.ext.padAround
 
 fun table(
@@ -22,22 +23,22 @@ class TableBuilder internal constructor(
     fun header(block: HeaderBuilder.() -> Unit) {
         val headerBuilder = HeaderBuilder().apply(block)
 
-        require(headerBuilder.cells.sumOf { it.span } == columnCount) {
+        require(headerBuilder.cells.isEmpty() || headerBuilder.cells.sumOf { it.span } == columnCount) {
             "Header cells do not match column count"
         }
 
-        val newCells = headerBuilder.cells.map { it.copy(it.value.trim().fillAround(1)) }
+        val newCells = headerBuilder.cells.map { it.copy(it.text.fillAround(1)) }
         headers.add(Row.Header(newCells))
     }
 
     fun item(block: ItemBuilder.() -> Unit) {
         val itemBuilder = ItemBuilder().apply(block)
 
-        require(itemBuilder.cells.sumOf { it.span } == columnCount) {
+        require(itemBuilder.cells.isEmpty() || itemBuilder.cells.sumOf { it.span } == columnCount) {
             "Item cells do not match column count"
         }
 
-        val newCells = itemBuilder.cells.map { it.copy(it.value.trim().fillAround(1)) }
+        val newCells = itemBuilder.cells.map { it.copy(it.text.fillAround(1)) }
         items.add(Row.Item(newCells))
     }
 
@@ -60,7 +61,7 @@ class TableBuilder internal constructor(
             table.append(tokens.vertical)
             val header = header.cells.joinToString(tokens.vertical) { cell ->
                 val cellLength = Array(cell.span) { columnLengths[it] }.sumOf { it } + cell.span - 1
-                cell.value.padAround(cellLength)
+                cell.text.padAround(cellLength)
             }
             table.append(header)
             table.append(tokens.vertical)
@@ -78,7 +79,7 @@ class TableBuilder internal constructor(
             table.append(tokens.vertical)
             val item = item.cells.mapIndexed { index, cell ->
                 val cellLength = columnLengths.slice(index until index + cell.span).sum() + cell.span - 1
-                cell.value.padEnd(cellLength)
+                cell.text.padEnd(cellLength)
             }.joinToString(tokens.vertical)
             table.append(item)
             table.append(tokens.vertical)
@@ -97,11 +98,11 @@ class TableBuilder internal constructor(
         val headerMaxLength = Array(columnCount) {
             calculateColumnLength(headers, it, excludeMultiColumnCells = false)
         }.sum()
-        val headerAdditionalLength = columnCount - headers.flatMap { it.cells.map { it.span } }.min()
+        val headerAdditionalLength = columnCount - (headers.flatMap { it.cells.map { it.span } }.minOrNull() ?: 0)
         val itemMaxLength = Array(columnCount) {
             calculateColumnLength(items, it, excludeMultiColumnCells = false)
         }.sum()
-        val itemAdditionalLength = columnCount - items.flatMap { it.cells.map { it.span } }.min()
+        val itemAdditionalLength = columnCount - (items.flatMap { it.cells.map { it.span } }.minOrNull() ?: 0)
 
         return maxOf(headerMaxLength + headerAdditionalLength, itemMaxLength + itemAdditionalLength)
     }
@@ -112,7 +113,7 @@ class TableBuilder internal constructor(
         innerBoxLength: Int? = null,
         excludeMultiColumnCells: Boolean = true,
     ): Int {
-        if (innerBoxLength != null && columnIndex == columnCount - 1) {
+        if (innerBoxLength != null && columnIndex == columnCount - 1 && columnCount > 1) {
             var otherLength = 0
             for (i in 0 until columnCount - 1) {
                 otherLength += calculateColumnLength(
@@ -128,7 +129,7 @@ class TableBuilder internal constructor(
         }
         return list.mapNotNull { it.cells.getOrNull(columnIndex) }
             .run { if (excludeMultiColumnCells) filter { it.span == 1 } else this }
-            .maxOfOrNull { it.value.length } ?: 0
+            .maxOfOrNull { it.text.length } ?: 0
     }
 
     private fun calculateColumnLength(
@@ -178,8 +179,6 @@ internal sealed interface Row {
 }
 
 data class Cell(
-    private val text: String,
+    val text: String,
     val span: Int = 1,
-) {
-    val value: String = text.trim().fillAround(1)
-}
+)

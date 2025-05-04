@@ -1,6 +1,9 @@
 package dev.jianastrero.utils.log
 
+import dev.jianastrero.utils.ext.splitLines
+import dev.jianastrero.utils.table.TableTokens
 import dev.jianastrero.utils.table.table
+import dev.jianastrero.utils.trace.getCaller
 
 internal class DeepLogStringBuilder {
     var caller: String = ""
@@ -66,7 +69,7 @@ internal fun deepLog(block: DeepLogStringBuilder.() -> Unit): String {
         "${" ".repeat(index + 1)}↳ $stack "
     }
 
-    return table(3) {
+    val innerTable = table(3) {
         header {
             cell("$name [$className]", 3)
         }
@@ -86,4 +89,22 @@ internal fun deepLog(block: DeepLogStringBuilder.() -> Unit): String {
             }
         }
     }
+
+    val outerTable = table(1, TableTokens.Thick) {
+        header {
+            cell(builder.caller)
+        }
+        innerTable.splitLines().forEach { line ->
+            header {
+                cell(line)
+            }
+        }
+        callStackStringList.forEach {
+            item {
+                cell(it)
+            }
+        }
+    }
+
+    return outerTable
 }
