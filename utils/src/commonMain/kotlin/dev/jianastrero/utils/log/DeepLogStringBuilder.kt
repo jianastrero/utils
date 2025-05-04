@@ -3,7 +3,6 @@ package dev.jianastrero.utils.log
 import dev.jianastrero.utils.ext.splitLines
 import dev.jianastrero.utils.table.TableTokens
 import dev.jianastrero.utils.table.table
-import dev.jianastrero.utils.trace.getCaller
 
 internal class DeepLogStringBuilder {
     var caller: String = ""
@@ -63,6 +62,7 @@ internal fun deepLog(block: DeepLogStringBuilder.() -> Unit): String {
         builder.properties
     }
 
+    val value = builder.value
     val valueString = if (properties.isEmpty()) builder.value?.toString().orEmpty() else ""
 
     val callStackStringList = callStack.mapIndexed { index, stack ->
@@ -74,7 +74,31 @@ internal fun deepLog(block: DeepLogStringBuilder.() -> Unit): String {
             cell("$name [$className]", 3)
         }
 
-        if (properties.isEmpty()) {
+        if (value is Array<*>) {
+            value.forEachIndexed { index, item ->
+                item {
+                    cell("$name[$index]")
+                    cell(item.toString())
+                    cell(item?.let { it::class.qualifiedName } ?: "Unknown Class")
+                }
+            }
+        } else if (value is Iterable<*>) {
+            value.forEachIndexed { index, item ->
+                item {
+                    cell("$name[$index]")
+                    cell(item.toString())
+                    cell(item?.let { it::class.qualifiedName } ?: "Unknown Class")
+                }
+            }
+        } else if (value is Map<*, *>) {
+            value.forEach { (key, item) ->
+                item {
+                    cell("$name[$key]")
+                    cell(item.toString())
+                    cell(item?.let { it::class.qualifiedName } ?: "Unknown Class")
+                }
+            }
+        } else if (properties.isEmpty()) {
             item {
                 cell("value", 1)
                 cell(valueString, 2)
