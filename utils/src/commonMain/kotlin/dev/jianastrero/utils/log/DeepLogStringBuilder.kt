@@ -4,11 +4,46 @@ import dev.jianastrero.utils.table.table
 
 internal class DeepLogStringBuilder {
     var caller: String = ""
+        private set
+
     var name: String = ""
+        private set
+
     var className: String = ""
+        private set
+
     var callStack: List<String> = emptyList()
+        private set
+
     var value: Any? = null
+        private set
+
     var properties: List<Triple<String, String, Any?>> = emptyList()
+        private set
+
+    fun caller(caller: String) {
+        this.caller = caller
+    }
+
+    fun name(name: String) {
+        this.name = name
+    }
+
+    fun className(className: String) {
+        this.className = className
+    }
+
+    fun callStack(callStack: List<String>) {
+        this.callStack = callStack
+    }
+
+    fun value(value: Any?) {
+        this.value = value
+    }
+
+    fun properties(properties: List<Triple<String, String, Any?>>) {
+        this.properties = properties
+    }
 }
 
 private const val CLASS_STRING = "kotlin.String"
