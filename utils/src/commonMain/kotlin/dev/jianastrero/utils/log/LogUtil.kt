@@ -46,7 +46,12 @@ fun <T> T.logDeep(name: String, tag: String = LogUtil.tag, level: LogLevel = Log
     val kClass = this::class
     val caller = getCaller()
     val className = kClass.qualifiedName ?: "Unknown Class"
-    val propertiesList = getPropertyList(name = name, level = level)
+    val propertiesList = when (this) {
+        is Array<*>,
+        is Iterable<*>,
+        is Map<*, *> -> emptyList()
+        else -> getPropertyList(name = name, level = level)
+    }
     val callStack = getCallStack(name = name, level = level)
 
     val logMessage = deepLog {
@@ -63,6 +68,10 @@ fun <T> T.logDeep(name: String, tag: String = LogUtil.tag, level: LogLevel = Log
         tag = tag,
         level = level,
     )
+
+    if (this is Throwable) {
+        printStackTrace()
+    }
 
     return this
 }

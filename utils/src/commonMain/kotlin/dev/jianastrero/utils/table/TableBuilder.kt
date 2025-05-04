@@ -1,7 +1,6 @@
 package dev.jianastrero.utils.table
 
 import dev.jianastrero.utils.ext.fillAround
-import dev.jianastrero.utils.ext.orZero
 import dev.jianastrero.utils.ext.padAround
 
 fun table(
