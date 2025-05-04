@@ -27,6 +27,7 @@ internal class DeepLogStringBuilder {
         const val THIN_BOX_BOTTOM     = "└%s┘"
         const val THIN_HR             = "├%s┤"
         const val THIN_BOX_HORIZONTAL = "─"
+        const val THIN_BOX_HORIZONTAL_DOWN = "┬"
     }
 }
 
