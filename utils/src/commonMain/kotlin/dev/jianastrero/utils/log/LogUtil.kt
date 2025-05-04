@@ -50,12 +50,12 @@ fun <T> T.logDeep(name: String, tag: String = LogUtil.tag, level: LogLevel = Log
     val callStack = getCallStack(name = name, level = level)
 
     val logMessage = deepLog {
-        this.name = name
-        this.className = className
-        this.caller = caller
-        this.value = this@logDeep
-        this.properties = propertiesList ?: emptyList()
-        this.callStack = callStack ?: emptyList()
+        name(name)
+        className(className)
+        caller(caller)
+        value(this@logDeep)
+        properties(propertiesList ?: emptyList())
+        callStack(callStack ?: emptyList())
     }
 
     println(
