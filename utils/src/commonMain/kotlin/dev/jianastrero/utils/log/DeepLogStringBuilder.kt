@@ -150,9 +150,7 @@ internal fun deepLog(block: DeepLogStringBuilder.() -> Unit): String {
     }
 
     val innerTable = table(3) {
-        header {
-            cell("$name [$className]", 3)
-        }
+        !"$name [$className]"
 
         when {
             value is Array<*> -> {
@@ -171,39 +169,27 @@ internal fun deepLog(block: DeepLogStringBuilder.() -> Unit): String {
                 }
             }
             properties.isEmpty() -> {
-                item {
-                    cell("value", 1)
-                    cell(valueString, 2)
-                }
+                +arrayOf(
+                    "value" * 1,
+                    valueString * 2
+                )
             }
             else -> {
                 properties.forEach { (propertyName, propertyClass, propertyValue) ->
-                    item {
-                        cell(propertyName)
-                        cell(propertyClass)
-                        cell(propertyValue.toString())
-                    }
+                    +arrayOf(
+                        propertyName,
+                        propertyClass,
+                        propertyValue.toString()
+                    )
                 }
             }
         }
     }
 
-    println("---- CREATING THICK TABLE ----")
-
     val outerTable = table(1, TableTokens.Thick) {
-        header {
-            cell(builder.caller)
-        }
-        innerTable.splitLines().forEach { line ->
-            header {
-                cell(line)
-            }
-        }
-        callStackStringList.forEach {
-            item {
-                cell(it)
-            }
-        }
+        !builder.caller
+        innerTable.splitLines().forEach { !it }
+        callStackStringList.forEach { +it }
     }
 
     return outerTable
@@ -224,9 +210,9 @@ private fun TableBuilder.collection(
     item: Any?,
     index: Any?,
 ) {
-    item {
-        cell("$name[$index]")
-        cell(item.toString())
-        cell(item?.let { it::class.qualifiedName } ?: "Unknown Class")
-    }
+    +arrayOf(
+        "$name[$index]",
+        item.toString(),
+        (item?.let { it::class.qualifiedName } ?: "Unknown Class")
+    )
 }
