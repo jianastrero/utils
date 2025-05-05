@@ -47,12 +47,12 @@ val tableString = table(2) {
 }
 
 // Output:
-// ┌──────┬─────┐
+// ┌────────────┐
 // │ Name │ Age │
-// │──────┼─────│
+// │────────────│
 // │ John │ 25  │
 // │ Jane │ 30  │
-// └──────┴─────┘
+// └────────────┘
 ```
 
 ### Reflection Utilities
@@ -94,7 +94,7 @@ dependencies {
 
 ## License
 
-Apache License 2.0
+MIT License
 
 ## Contributing
 
