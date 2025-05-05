@@ -127,6 +127,14 @@ dependencies {
 
 MIT License
 
+### Checking Coverage During Build
+
+Code coverage reports are automatically generated during the check task:
+
+```bash
+./gradlew check
+```
+
 ## Contributing
 
 Contributions are welcome! Please feel free to submit a Pull Request.
