@@ -2,6 +2,7 @@ package dev.jianastrero.utils.table
 
 import dev.jianastrero.utils.ext.fillAround
 import dev.jianastrero.utils.ext.padAround
+import kotlin.math.max
 
 /**
  * Data class representing a cell in a table.
@@ -30,7 +31,7 @@ class HeaderBuilder internal constructor() {
      * @param span The number of columns this cell spans (defaults to 1)
      */
     fun cell(text: String, span: Int = 1) {
-        cells.add(Cell(text, span))
+        cells += Cell(text, span)
     }
 }
 
@@ -50,7 +51,7 @@ class ItemBuilder internal constructor() {
      * @param span The number of columns this cell spans (defaults to 1)
      */
     fun cell(text: String, span: Int = 1) {
-        cells.add(Cell(text, span))
+        cells += Cell(text, span)
     }
 }
 
@@ -139,10 +140,11 @@ class TableBuilder internal constructor(
      * @return A formatted string representation of the table
      */
     fun build(): String {
-        val innerBoxLength = calculateInnerBoxLength()
-        val columnLengths = Array(columnCount) {
-            calculateColumnLength(columnIndex = it, innerBoxLength = innerBoxLength)
-        }
+        val headerLengths = calculateMaxColumnLengths(headers)
+        val itemLengths = calculateMaxColumnLengths(items)
+
+        val innerBoxLength = headerLengths.zip(itemLengths).sumOf { (a, b) -> maxOf(a, b) } + columnCount - 1
+        val columnLengths = calculateColumnLengths(headerLengths, itemLengths)
 
         val table = StringBuilder()
 
@@ -155,10 +157,10 @@ class TableBuilder internal constructor(
         headers.forEach { header ->
             table.appendLine()
             table.append(tokens.vertical)
-            val header = header.cells.joinToString(tokens.vertical) { cell ->
-                val cellLength = Array(cell.span) { columnLengths[it] }.sumOf { it } + cell.span - 1
-                cell.text.padAround(cellLength)
-            }
+            val header = header.cells.mapIndexed { index, cell ->
+                val length = Array(cell.span) { columnLengths[index + it] }.sum() + cell.span - 1
+                cell.text.padAround(length)
+            }.joinToString(tokens.vertical)
             table.append(header)
             table.append(tokens.vertical)
         }
@@ -174,8 +176,8 @@ class TableBuilder internal constructor(
             table.appendLine()
             table.append(tokens.vertical)
             val item = item.cells.mapIndexed { index, cell ->
-                val cellLength = columnLengths.slice(index until index + cell.span).sum() + cell.span - 1
-                cell.text.padEnd(cellLength)
+                val length = Array(cell.span) { columnLengths[index + it] }.sum() + cell.span - 1
+                cell.text.padEnd(length)
             }.joinToString(tokens.vertical)
             table.append(item)
             table.append(tokens.vertical)
@@ -190,85 +192,59 @@ class TableBuilder internal constructor(
         return table.toString()
     }
 
-    /**
-     * Calculates the inner box length of the table.
-     *
-     * @return The total length of the inner content area of the table
-     */
-    private fun calculateInnerBoxLength(): Int {
-        val headerMaxLength = Array(columnCount) {
-            calculateColumnLength(headers, it, excludeMultiColumnCells = false)
-        }.sum()
-        val headerAdditionalLength = columnCount - (headers.flatMap { it.cells.map { it.span } }.minOrNull() ?: 0)
-        val itemMaxLength = Array(columnCount) {
-            calculateColumnLength(items, it, excludeMultiColumnCells = false)
-        }.sum()
-        val itemAdditionalLength = columnCount - (items.flatMap { it.cells.map { it.span } }.minOrNull() ?: 0)
-
-        return maxOf(headerMaxLength + headerAdditionalLength, itemMaxLength + itemAdditionalLength)
-    }
-
-    /**
-     * Calculates the length of a specific column.
-     *
-     * @param columnIndex The index of the column
-     * @param innerBoxLength The total inner box length (optional)
-     * @param excludeMultiColumnCells Whether to exclude cells that span multiple columns (defaults to true)
-     * @return The calculated length for the column
-     */
-    private fun calculateColumnLength(
-        columnIndex: Int,
-        innerBoxLength: Int? = null,
-        excludeMultiColumnCells: Boolean = true
-    ): Int {
-        val maxHeaderLength = calculateColumnLength(
-            list = headers,
-            columnIndex = columnIndex,
-            innerBoxLength = innerBoxLength,
-            excludeMultiColumnCells = excludeMultiColumnCells,
-        )
-        val maxItemLength = calculateColumnLength(
-            list = items,
-            columnIndex = columnIndex,
-            innerBoxLength = innerBoxLength,
-            excludeMultiColumnCells = excludeMultiColumnCells,
-        )
-
-        return maxOf(maxHeaderLength, maxItemLength)
-    }
-
-    /**
-     * Calculates the length of a specific column in a list of rows.
-     *
-     * @param list The list of rows to calculate the column length for
-     * @param columnIndex The index of the column
-     * @param innerBoxLength The total inner box length (optional)
-     * @param excludeMultiColumnCells Whether to exclude cells that span multiple columns (defaults to true)
-     * @return The calculated length for the column
-     */
-    private fun calculateColumnLength(
+    private fun calculateMaxColumnLengths(
         list: List<Row>,
-        columnIndex: Int,
-        innerBoxLength: Int? = null,
-        excludeMultiColumnCells: Boolean = true,
-    ): Int {
-        if (innerBoxLength != null && columnIndex == columnCount - 1 && columnCount > 1) {
-            var otherLength = 0
-            for (i in 0 until columnCount - 1) {
-                otherLength += calculateColumnLength(
-                    list = list,
-                    columnIndex = i,
-                    innerBoxLength = null,
-                    excludeMultiColumnCells = excludeMultiColumnCells
-                )
+    ): List<Int> {
+        val rowLengths = mutableListOf<List<Int>>()
+
+        for (row in list) {
+            val newRow = mutableListOf<Int>()
+            for (cell in row.cells) {
+                if (cell.span == 1) {
+                    newRow += cell.text.length
+                } else {
+                    val cellLength = cell.text.length + cell.span - 1
+                    val cellSpan = cell.span
+                    val cellLengthPerSpan = cellLength / cellSpan
+                    val cellRemainder = cellLength % cellSpan
+
+                    for (i in 0 until cellSpan) {
+                        newRow += if (i == cellSpan - 1) {
+                            cellLengthPerSpan + cellRemainder
+                        } else {
+                            cellLengthPerSpan
+                        }
+                    }
+                }
             }
-            if (otherLength == 0) return 0
-            otherLength += columnCount - 1
-            return innerBoxLength - otherLength
+
+            rowLengths += newRow
         }
-        return list.mapNotNull { it.cells.getOrNull(columnIndex) }
-            .run { if (excludeMultiColumnCells) filter { it.span == 1 } else this }
-            .maxOfOrNull { it.text.length } ?: 0
+
+        val maxRowLengths = mutableListOf<Int>()
+
+        for (i in 0 until columnCount) {
+            val maxLength = rowLengths.maxOfOrNull { it.getOrNull(i) ?: 0 } ?: 0
+            maxRowLengths += maxLength
+        }
+
+        return maxRowLengths
+    }
+
+    private fun calculateColumnLengths(
+        listA: List<Int>,
+        listB: List<Int>,
+    ): List<Int> {
+        val maxLength = maxOf(listA.size, listB.size)
+        val result = mutableListOf<Int>()
+
+        for (i in 0 until maxLength) {
+            val lengthA = listA.getOrNull(i) ?: 0
+            val lengthB = listB.getOrNull(i) ?: 0
+            result += maxOf(lengthA, lengthB)
+        }
+
+        return result
     }
 
     /**
@@ -285,7 +261,7 @@ class TableBuilder internal constructor(
         }
 
         val newCells = headerBuilder.cells.map { it.copy(it.text.fillAround(1)) }
-        headers.add(Row.Header(newCells))
+        headers += Row.Header(newCells)
     }
 
     /**
@@ -302,6 +278,6 @@ class TableBuilder internal constructor(
         }
 
         val newCells = itemBuilder.cells.map { it.copy(it.text.fillAround(1)) }
-        items.add(Row.Item(newCells))
+        items += Row.Item(newCells)
     }
 }

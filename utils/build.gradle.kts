@@ -32,12 +32,20 @@ kotlin {
         }
         val commonTest by getting {
             dependencies {
-                implementation(libs.kotlin.test)
+                implementation(kotlin("test"))
+                implementation(libs.kotest.framework.engine)
+                implementation(libs.kotest.assertions.core)
+                implementation(libs.kotest.property)
             }
         }
         val jvmMain by getting {
             dependencies {
                 implementation(libs.kotlinx.reflect)
+            }
+        }
+        val jvmTest by getting {
+            dependencies {
+                implementation(libs.kotest.jvm.junit)
             }
         }
         val androidMain by getting {
@@ -65,6 +73,26 @@ android {
     }
 }
 
+dependencies {
+    testImplementation(libs.kotest.jvm.junit)
+}
+
+tasks.named<Test>("jvmTest") {
+    useJUnitPlatform()
+    filter {
+        isFailOnNoMatchingTests = false
+    }
+    testLogging {
+        showExceptions = true
+        showStandardStreams = true
+        events = setOf(
+            org.gradle.api.tasks.testing.logging.TestLogEvent.FAILED,
+            org.gradle.api.tasks.testing.logging.TestLogEvent.PASSED
+        )
+        exceptionFormat = org.gradle.api.tasks.testing.logging.TestExceptionFormat.FULL
+    }
+}
+
 mavenPublishing {
     publishToMavenCentral(SonatypeHost.CENTRAL_PORTAL)
 
@@ -74,14 +102,14 @@ mavenPublishing {
 
     pom {
         name = "Jian Astrero's Utils"
-        description = "A utils library"
-        inceptionYear = "2025"
-        url = "https://github.com/jianastrero/utils"
+        description = "A utility library for Kotlin Multiplatform projects"
+        inceptionYear = "2023"
+        url = "https://github.com/jianastrero/jianastrero-utils"
         licenses {
             license {
-                name = "XXX"
-                url = "YYY"
-                distribution = "ZZZ"
+                name = "MIT License"
+                url = "https://opensource.org/licenses/MIT"
+                distribution = "repo"
             }
         }
         developers {
@@ -92,9 +120,9 @@ mavenPublishing {
             }
         }
         scm {
-            url = "XXX"
-            connection = "YYY"
-            developerConnection = "ZZZ"
+            url = "https://github.com/jianastrero/jianastrero-utils"
+            connection = "scm:git:git://github.com/jianastrero/jianastrero-utils.git"
+            developerConnection = "scm:git:ssh://github.com/jianastrero/jianastrero-utils.git"
         }
     }
 }

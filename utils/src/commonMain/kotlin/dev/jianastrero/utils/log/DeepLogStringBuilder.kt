@@ -188,6 +188,8 @@ internal fun deepLog(block: DeepLogStringBuilder.() -> Unit): String {
         }
     }
 
+    println("---- CREATING THICK TABLE ----")
+
     val outerTable = table(1, TableTokens.Thick) {
         header {
             cell(builder.caller)
