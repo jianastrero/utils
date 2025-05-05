@@ -55,6 +55,37 @@ val tableString = table(2) {
 // └────────────┘
 ```
 
+#### Concise Table Building with Operators
+
+The library also provides operator overloads for more concise table building:
+
+```kotlin
+// Using operator overloads for headers and items
+val tableString = table(2) {
+    !arrayOf("Name", "Age")  // Add header cells using the not operator
+    +arrayOf("John", "25")   // Add item cells using the unary plus operator
+    +arrayOf("Jane", "30")
+}
+
+// Using operators for spanning multiple columns
+val userInfoTable = table(3) {
+    !("User Information" * 3)  // Header cell spanning 3 columns
+    +arrayOf("John", "25", "Admin")
+}
+
+// Using operators within header and item blocks
+val detailedTable = table(2) {
+    header {
+        +"Name"              // Add a cell using unary plus
+        "Details" * 1        // Add a cell with span using times operator
+    }
+    item {
+        +"John"
+        +"Software Developer"
+    }
+}
+```
+
 ### Reflection Utilities
 
 Utilities for working with reflection across platforms:

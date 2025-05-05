@@ -33,6 +33,26 @@ class HeaderBuilder internal constructor() {
     fun cell(text: String, span: Int = 1) {
         cells += Cell(text, span)
     }
+
+    /**
+     * Operator overload for unary plus (+) to add a cell to the header row.
+     * 
+     * Example: +"Name"
+     */
+    operator fun String.unaryPlus() {
+        cell(this)
+    }
+
+    /**
+     * Operator overload for times (*) to add a cell with a specific span to the header row.
+     * 
+     * Example: "User Info" * 3
+     * 
+     * @param span The number of columns this cell spans
+     */
+    operator fun String.times(span: Int) {
+        cell(this, span)
+    }
 }
 
 /**
@@ -52,6 +72,26 @@ class ItemBuilder internal constructor() {
      */
     fun cell(text: String, span: Int = 1) {
         cells += Cell(text, span)
+    }
+
+    /**
+     * Operator overload for unary plus (+) to add a cell to the item row.
+     * 
+     * Example: +"John"
+     */
+    operator fun String.unaryPlus() {
+        cell(this)
+    }
+
+    /**
+     * Operator overload for times (*) to add a cell with a specific span to the item row.
+     * 
+     * Example: "Contact Details" * 2
+     * 
+     * @param span The number of columns this cell spans
+     */
+    operator fun String.times(span: Int) {
+        cell(this, span)
     }
 }
 
@@ -93,6 +133,7 @@ internal sealed interface Row {
  *
  * @example
  * ```
+ * // Standard approach
  * val tableString = table(2) {
  *     header {
  *         cell("Name")
@@ -106,6 +147,13 @@ internal sealed interface Row {
  *         cell("Jane")
  *         cell("30")
  *     }
+ * }
+ * 
+ * // Using operator overloads for more concise syntax
+ * val conciseTable = table(2) {
+ *     !arrayOf("Name", "Age")  // Add header cells using the not operator
+ *     +arrayOf("John", "25")   // Add item cells using the unary plus operator
+ *     +arrayOf("Jane", "30")
  * }
  * ```
  */
@@ -279,5 +327,114 @@ class TableBuilder internal constructor(
 
         val newCells = itemBuilder.cells.map { it.copy(it.text.fillAround(1)) }
         items += Row.Item(newCells)
+    }
+
+    /**
+     * Operator overload for times (*) to create a pair of string and span.
+     * This is used in conjunction with other operators.
+     * 
+     * Example: "User Info" * 3
+     * 
+     * @param span The number of columns this cell spans
+     * @return A pair of the string and span
+     */
+    operator fun String.times(span: Int): Pair<String, Int> {
+        return Pair(this, span)
+    }
+
+    /**
+     * Operator overload for not (!) to add a header cell spanning all columns.
+     * 
+     * Example: !"User Information"
+     */
+    operator fun String.not() {
+        header {
+            cell(this@not, columnCount)
+        }
+    }
+
+    /**
+     * Operator overload for not (!) to add a header cell with a specific span.
+     * 
+     * Example: !("User Information" * 3)
+     */
+    operator fun Pair<String, Int>.not() {
+        header {
+            cell(first, second)
+        }
+    }
+
+    /**
+     * Operator overload for not (!) to add multiple header cells.
+     * 
+     * Example: !arrayOf("Name", "Age", "Role")
+     */
+    operator fun Array<String>.not() {
+        header {
+            this@not.forEach {
+                cell(it)
+            }
+        }
+    }
+
+    /**
+     * Operator overload for not (!) to add multiple header cells with specific spans.
+     * 
+     * Example: !arrayOf("Name" * 1, "Details" * 2)
+     */
+    operator fun Array<Pair<String, Int>>.not() {
+        header {
+            this@not.forEach {
+                cell(it.first, it.second)
+            }
+        }
+    }
+
+    /**
+     * Operator overload for unary plus (+) to add an item cell spanning all columns.
+     * 
+     * Example: +"Contact Information"
+     */
+    operator fun String.unaryPlus() {
+        item {
+            cell(this@unaryPlus, columnCount)
+        }
+    }
+
+    /**
+     * Operator overload for unary plus (+) to add an item cell with a specific span.
+     * 
+     * Example: +("Contact Details" * 3)
+     */
+    operator fun Pair<String, Int>.unaryPlus() {
+        item {
+            cell(first, second)
+        }
+    }
+
+    /**
+     * Operator overload for unary plus (+) to add multiple item cells.
+     * 
+     * Example: +arrayOf("John", "25", "Developer")
+     */
+    operator fun Array<String>.unaryPlus() {
+        item {
+            this@unaryPlus.forEach {
+                cell(it)
+            }
+        }
+    }
+
+    /**
+     * Operator overload for unary plus (+) to add multiple item cells with specific spans.
+     * 
+     * Example: +arrayOf("John" * 1, "Contact Details" * 2)
+     */
+    operator fun Array<Pair<String, Int>>.unaryPlus() {
+        item {
+            this@unaryPlus.forEach {
+                cell(it.first, it.second)
+            }
+        }
     }
 }
