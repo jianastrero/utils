@@ -9,6 +9,16 @@ plugins {
     alias(libs.plugins.kover)
 }
 
+kover {
+    reports {
+        filters {
+            excludes {
+                classes("dev.jianastrero.main.*") // Exclude the main package from coverage
+            }
+        }
+    }
+}
+
 group = "dev.jianastrero.utils"
 version = "1.0.0"
 

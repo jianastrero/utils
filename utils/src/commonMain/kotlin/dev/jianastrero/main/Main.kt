@@ -1,11 +1,9 @@
-package dev.jianastrero
+package dev.jianastrero.main
 
 import dev.jianastrero.utils.log.LogLevel
 import dev.jianastrero.utils.log.LogUtil
 import dev.jianastrero.utils.log.log
 import dev.jianastrero.utils.log.logDeep
-import dev.jianastrero.utils.table.TableTokens
-import dev.jianastrero.utils.table.table
 
 data class MyClass(
     val name: String,
