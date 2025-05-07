@@ -13,7 +13,10 @@ kover {
     reports {
         filters {
             excludes {
-                classes("dev.jianastrero.main.*") // Exclude the main package from coverage
+                classes(
+                    "dev.jianastrero.main.*", // Exclude the main package from coverage
+                    "dev.jianastrero.utils.format.FormatTokens"
+                )
             }
         }
     }
