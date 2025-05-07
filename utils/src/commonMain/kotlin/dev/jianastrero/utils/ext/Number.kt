@@ -1,8 +1,14 @@
 package dev.jianastrero.utils.ext
 
-fun Byte?.orZero() = this ?: 0
-fun Short?.orZero() = this ?: 0
-fun Int?.orZero() = this ?: 0
-fun Long?.orZero() = this ?: 0L
-fun Float?.orZero() = this ?: 0f
-fun Double?.orZero() = this ?: 0.0
+@Suppress("UNCHECKED_CAST")
+fun <T : Number> T?.orZero(): T {
+    return when (this) {
+        is Byte -> 0.toByte()
+        is Short -> 0.toShort()
+        is Int -> 0
+        is Long -> 0
+        is Float -> 0
+        is Double -> 0.0
+        else -> error("Cannot convert $this to zero")
+    } as T
+}
