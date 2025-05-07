@@ -54,6 +54,11 @@ kotlin {
                 implementation(libs.kotlinx.reflect)
             }
         }
+        val androidUnitTest by getting {
+            dependencies {
+                implementation(libs.kotest.jvm.junit)
+            }
+        }
     }
 }
 
@@ -69,7 +74,15 @@ android {
     }
     buildTypes {
         release {
-            isMinifyEnabled = true
+            isMinifyEnabled = false // Disabled for unit tests
+        }
+    }
+    testOptions {
+        unitTests {
+            isIncludeAndroidResources = true
+            all {
+                it.useJUnitPlatform()
+            }
         }
     }
 }
