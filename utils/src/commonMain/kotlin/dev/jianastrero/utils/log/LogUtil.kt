@@ -1,6 +1,6 @@
 package dev.jianastrero.utils.log
 
-import dev.jianastrero.utils.println
+import dev.jianastrero.utils.console.println
 import dev.jianastrero.utils.reflect.getProperties
 import dev.jianastrero.utils.trace.getCaller
 import dev.jianastrero.utils.trace.getStackTrace
