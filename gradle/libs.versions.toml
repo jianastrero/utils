@@ -5,6 +5,7 @@ android-minSdk = "26"
 android-compileSdk = "35"
 kotest = "5.9.1"
 kover = "0.8.1"
+mockk = "1.14.2"
 
 [libraries]
 kotlinx-reflect = { module = "org.jetbrains.kotlin:kotlin-reflect", version.ref = "kotlin" }
@@ -15,6 +16,9 @@ kotest-framework-engine = { module = "io.kotest:kotest-framework-engine", versio
 kotest-assertions-core = { module = "io.kotest:kotest-assertions-core", version.ref = "kotest" }
 kotest-property = { module = "io.kotest:kotest-property", version.ref = "kotest" }
 kotest-jvm-junit = { module = "io.kotest:kotest-runner-junit5", version.ref = "kotest" }
+
+# Mockk
+mockk = { module = "io.mockk:mockk", version.ref = "mockk" }
 
 [plugins]
 androidLibrary = { id = "com.android.library", version.ref = "agp" }
