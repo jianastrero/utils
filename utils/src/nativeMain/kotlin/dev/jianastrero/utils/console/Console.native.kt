@@ -1,4 +1,4 @@
-package dev.jianastrero.utils
+package dev.jianastrero.utils.console
 
 import dev.jianastrero.utils.log.LogLevel
 
