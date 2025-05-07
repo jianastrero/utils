@@ -60,6 +60,7 @@ kotlin {
         val jvmTest by getting {
             dependencies {
                 implementation(libs.kotest.jvm.junit)
+                implementation(libs.mockk)
             }
         }
         val androidMain by getting {
@@ -70,6 +71,7 @@ kotlin {
         val androidUnitTest by getting {
             dependencies {
                 implementation(libs.kotest.jvm.junit)
+                implementation(libs.mockk)
             }
         }
     }
