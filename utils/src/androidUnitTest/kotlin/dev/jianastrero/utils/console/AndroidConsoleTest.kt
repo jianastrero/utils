@@ -9,33 +9,34 @@ import io.mockk.every
 import io.mockk.mockkStatic
 import io.mockk.slot
 import io.mockk.unmockkStatic
+import io.mockk.verify
 
 class AndroidConsoleTest : StringSpec({
+
+    beforeTest {
+        mockkStatic(Log::class)
+    }
+
+    afterTest {
+        unmockkStatic(Log::class)
+    }
+
     "println should call Log.e for ERROR level" {
         // Arrange
         val message = "Test error message"
         val tag = "TestTag"
         val level = LogLevel.ERROR
-
-        // Mock Android Log
-        mockkStatic(Log::class)
-
-        // Capture calls to Log.e
         val tagSlot = slot<String>()
         val messageSlot = slot<String>()
         every { Log.e(capture(tagSlot), capture(messageSlot)) } returns 0
 
-        try {
-            // Act
-            println(message, tag, level)
+        // Act
+        println(message, tag, level)
 
-            // Assert
-            tagSlot.captured shouldBe tag
-            messageSlot.captured shouldBe message
-        } finally {
-            // Clean up
-            unmockkStatic(Log::class)
-        }
+        // Assert
+        tagSlot.captured shouldBe tag
+        messageSlot.captured shouldBe message
+        verify { Log.e(any(), any()) }
     }
 
     "println should call Log.w for WARNING level" {
@@ -43,26 +44,17 @@ class AndroidConsoleTest : StringSpec({
         val message = "Test warning message"
         val tag = "TestTag"
         val level = LogLevel.WARNING
-
-        // Mock Android Log
-        mockkStatic(Log::class)
-
-        // Capture calls to Log.w
         val tagSlot = slot<String>()
         val messageSlot = slot<String>()
         every { Log.w(capture(tagSlot), capture(messageSlot)) } returns 0
 
-        try {
-            // Act
-            println(message, tag, level)
+        // Act
+        println(message, tag, level)
 
-            // Assert
-            tagSlot.captured shouldBe tag
-            messageSlot.captured shouldBe message
-        } finally {
-            // Clean up
-            unmockkStatic(Log::class)
-        }
+        // Assert
+        tagSlot.captured shouldBe tag
+        messageSlot.captured shouldBe message
+        verify { Log.w(any(), any<String>()) }
     }
 
     "println should call Log.i for INFO level" {
@@ -70,26 +62,17 @@ class AndroidConsoleTest : StringSpec({
         val message = "Test info message"
         val tag = "TestTag"
         val level = LogLevel.INFO
-
-        // Mock Android Log
-        mockkStatic(Log::class)
-
-        // Capture calls to Log.i
         val tagSlot = slot<String>()
         val messageSlot = slot<String>()
         every { Log.i(capture(tagSlot), capture(messageSlot)) } returns 0
 
-        try {
-            // Act
-            println(message, tag, level)
+        // Act
+        println(message, tag, level)
 
-            // Assert
-            tagSlot.captured shouldBe tag
-            messageSlot.captured shouldBe message
-        } finally {
-            // Clean up
-            unmockkStatic(Log::class)
-        }
+        // Assert
+        tagSlot.captured shouldBe tag
+        messageSlot.captured shouldBe message
+        verify { Log.i(any(), any()) }
     }
 
     "println should call Log.d for DEBUG level" {
@@ -97,52 +80,33 @@ class AndroidConsoleTest : StringSpec({
         val message = "Test debug message"
         val tag = "TestTag"
         val level = LogLevel.DEBUG
-
-        // Mock Android Log
-        mockkStatic(Log::class)
-
-        // Capture calls to Log.d
         val tagSlot = slot<String>()
         val messageSlot = slot<String>()
         every { Log.d(capture(tagSlot), capture(messageSlot)) } returns 0
 
-        try {
-            // Act
-            println(message, tag, level)
+        // Act
+        println(message, tag, level)
 
-            // Assert
-            tagSlot.captured shouldBe tag
-            messageSlot.captured shouldBe message
-        } finally {
-            // Clean up
-            unmockkStatic(Log::class)
-        }
+        // Assert
+        tagSlot.captured shouldBe tag
+        messageSlot.captured shouldBe message
+        verify { Log.d(any(), any()) }
     }
 
     "println should use default tag and level when not provided" {
         // Arrange
         val message = "Test message"
         val defaultTag = LogUtil.tag
-        val defaultLevel = LogLevel.DEBUG
-
-        // Mock Android Log
-        mockkStatic(Log::class)
-
-        // Capture calls to Log.d
         val tagSlot = slot<String>()
         val messageSlot = slot<String>()
         every { Log.d(capture(tagSlot), capture(messageSlot)) } returns 0
 
-        try {
-            // Act
-            println(message)
+        // Act
+        println(message)
 
-            // Assert
-            tagSlot.captured shouldBe defaultTag
-            messageSlot.captured shouldBe message
-        } finally {
-            // Clean up
-            unmockkStatic(Log::class)
-        }
+        // Assert
+        tagSlot.captured shouldBe defaultTag
+        messageSlot.captured shouldBe message
+        verify { Log.d(any(), any()) }
     }
 })
