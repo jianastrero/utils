@@ -4,10 +4,24 @@ import dev.jianastrero.utils.log.LogLevel
 import dev.jianastrero.utils.log.LogUtil
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
+import io.mockk.verify
 import java.io.ByteArrayOutputStream
 import java.io.PrintStream
 
 class JvmConsoleTest : StringSpec({
+    lateinit var originalOut: PrintStream
+    lateinit var outputStream: ByteArrayOutputStream
+
+    beforeTest {
+        originalOut = System.out
+        outputStream = ByteArrayOutputStream()
+        System.setOut(PrintStream(outputStream))
+    }
+
+    afterTest {
+        System.setOut(originalOut)
+    }
+
     "println should format message with tag and level" {
         // Arrange
         val message = "Test message"
@@ -15,22 +29,12 @@ class JvmConsoleTest : StringSpec({
         val level = LogLevel.INFO
         val expectedLogMessage = "[${level.name}][$tag]: $message"
 
-        // Redirect System.out to capture printed output
-        val originalOut = System.out
-        val outputStream = ByteArrayOutputStream()
-        System.setOut(PrintStream(outputStream))
+        // Act
+        println(message, tag, level)
 
-        try {
-            // Act
-            println(message, tag, level)
-
-            // Assert
-            val printedOutput = outputStream.toString().trim()
-            printedOutput shouldBe expectedLogMessage
-        } finally {
-            // Restore System.out
-            System.setOut(originalOut)
-        }
+        // Assert
+        val printedOutput = outputStream.toString().trim()
+        printedOutput shouldBe expectedLogMessage
     }
 
     "println should use default tag and level when not provided" {
@@ -40,21 +44,11 @@ class JvmConsoleTest : StringSpec({
         val defaultLevel = LogLevel.DEBUG
         val expectedLogMessage = "[${defaultLevel.name}][$defaultTag]: $message"
 
-        // Redirect System.out to capture printed output
-        val originalOut = System.out
-        val outputStream = ByteArrayOutputStream()
-        System.setOut(PrintStream(outputStream))
+        // Act
+        println(message)
 
-        try {
-            // Act
-            println(message)
-
-            // Assert
-            val printedOutput = outputStream.toString().trim()
-            printedOutput shouldBe expectedLogMessage
-        } finally {
-            // Restore System.out
-            System.setOut(originalOut)
-        }
+        // Assert
+        val printedOutput = outputStream.toString().trim()
+        printedOutput shouldBe expectedLogMessage
     }
 })
