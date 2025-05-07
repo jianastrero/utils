@@ -2,7 +2,6 @@ package dev.jianastrero.utils.uuid
 
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
-import io.kotest.property.Constraints.Companion.iterations
 
 class UUIDTest : StringSpec({
     "UUID generation should produce a valid UUID" {
