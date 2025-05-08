@@ -21,7 +21,7 @@ class LogLevelTest : StringSpec({
     }
     
     "LogLevel values should be in ascending order of severity" {
-        val levels = LogLevel.values()
+        val levels = LogLevel.entries
         for (i in 0 until levels.size - 1) {
             levels[i].level shouldBe i
             levels[i].level shouldBe (levels[i + 1].level - 1)
