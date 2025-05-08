@@ -22,7 +22,9 @@ kover {
     }
 }
 
-group = "dev.jianastrero.utils"
+val artifactId = "utils"
+val groupId = "dev.jianastrero"
+group = "${groupId}.${artifactId}"
 version = "1.0.0"
 
 kotlin {
@@ -78,7 +80,7 @@ kotlin {
 }
 
 android {
-    namespace = "dev.jianastrero.utils"
+    namespace = "${groupId}.${artifactId}"
     compileSdk = libs.versions.android.compileSdk.get().toInt()
     defaultConfig {
         minSdk = libs.versions.android.minSdk.get().toInt()
@@ -127,7 +129,7 @@ mavenPublishing {
 
     signAllPublications()
 
-    coordinates(group.toString(), "library", version.toString())
+    coordinates(groupId, artifactId, version.toString())
 
     pom {
         name = "Jian Astrero's Utils"
