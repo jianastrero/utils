@@ -151,7 +151,7 @@ mavenPublishing {
         scm {
             url = "https://github.com/jianastrero/jianastrero-utils"
             connection = "scm:git:git://github.com/jianastrero/jianastrero-utils.git"
-            developerConnection = "scm:git:ssh://github.com/jianastrero/jianastrero-utils.git"
+            developerConnection = "scm:git:ssh://git@github.com/jianastrero/jianastrero-utils.git"
         }
     }
 }
