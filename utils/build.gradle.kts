@@ -23,8 +23,7 @@ kover {
 }
 
 val artifactId = "utils"
-val groupId = "dev.jianastrero"
-group = "${groupId}.${artifactId}"
+group = "dev.jianastrero"
 version = "1.0.0"
 
 kotlin {
@@ -80,7 +79,7 @@ kotlin {
 }
 
 android {
-    namespace = "${groupId}.${artifactId}"
+    namespace = "$group.$artifactId"
     compileSdk = libs.versions.android.compileSdk.get().toInt()
     defaultConfig {
         minSdk = libs.versions.android.minSdk.get().toInt()
@@ -129,12 +128,12 @@ mavenPublishing {
 
     signAllPublications()
 
-    coordinates(groupId, artifactId, version.toString())
+    coordinates(group.toString(), artifactId, version.toString())
 
     pom {
         name = "Jian Astrero's Utils"
-        description = "A utility library for Kotlin Multiplatform projects"
-        inceptionYear = "2023"
+        description = "My own utility library for Kotlin Multiplatform projects"
+        inceptionYear = "2025"
         url = "https://github.com/jianastrero/jianastrero-utils"
         licenses {
             license {
