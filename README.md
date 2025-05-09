@@ -107,13 +107,13 @@ Add the dependency to your `build.gradle.kts` file:
 
 ### Android
 ```kotlin
-debugImplementation("dev.jianastrero.utils:library:1.0.0")
+debugImplementation("dev.jianastrero:utils:1.0.0")
 ```
 
 ### Other platforms
 ```kotlin
 dependencies {
-    implementation("dev.jianastrero.utils:library:1.0.0")
+    implementation("dev.jianastrero:utils:1.0.0")
 }
 ```
 
