@@ -23,7 +23,7 @@ kover {
 }
 
 val artifactId = "utils"
-group = "dev.jianastrero"
+group = "io.github.jianastrero"
 version = "1.0.0"
 
 kotlin {

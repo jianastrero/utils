@@ -1,10 +1,13 @@
 # Jian Astrero's Utils
 
-A comprehensive utility library for Kotlin Multiplatform projects, providing a collection of useful functions and classes for common development tasks.
+A comprehensive utility library for Kotlin Multiplatform projects, providing a collection of useful functions and
+classes for common development tasks.
 
 ## Overview
 
-This library contains various utility functions developed and will primarily be used by [Jian James Astrero](https://github.com/jianastrero) for use in development projects. The utilities are organized into packages for different purposes such as logging, reflection, table formatting, and more.
+This library contains various utility functions developed and will primarily be used
+by [Jian James Astrero](https://github.com/jianastrero) for use in development projects. The utilities are organized
+into packages for different purposes such as logging, reflection, table formatting, and more.
 
 ## Features
 
@@ -106,14 +109,20 @@ Utilities for working with reflection across platforms:
 Add the dependency to your `build.gradle.kts` file:
 
 ### Android
+
 ```kotlin
-debugImplementation("dev.jianastrero:utils:1.0.0")
+// For all variants
+implementation("io.github.jianastrero:utils:1.0.0")
+
+// For Debug Only
+debugImplementation("io.github.jianastrero:utils:1.0.0")
 ```
 
 ### Other platforms
+
 ```kotlin
 dependencies {
-    implementation("dev.jianastrero:utils:1.0.0")
+    implementation("io.github.jianastrero:utils:1.0.0")
 }
 ```
 
