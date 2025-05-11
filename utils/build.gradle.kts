@@ -42,7 +42,9 @@ kotlin {
     iosArm64()
     iosSimulatorArm64()
     linuxX64()
-    wasmJs()
+    wasmJs {
+        browser()
+    }
 
     sourceSets {
         val commonMain by getting {
