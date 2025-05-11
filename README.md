@@ -112,17 +112,17 @@ Add the dependency to your `build.gradle.kts` file:
 
 ```kotlin
 // For all variants
-implementation("io.github.jianastrero:utils:1.0.0")
+implementation("io.github.jianastrero:utils:1.1.0")
 
 // For Debug Only
-debugImplementation("io.github.jianastrero:utils:1.0.0")
+debugImplementation("io.github.jianastrero:utils:1.1.0")
 ```
 
 ### Other platforms
 
 ```kotlin
 dependencies {
-    implementation("io.github.jianastrero:utils:1.0.0")
+    implementation("io.github.jianastrero:utils:1.1.0")
 }
 ```
 
