@@ -1,6 +1,5 @@
 package dev.jianastrero.utils.reflect
 
-import kotlin.Throws
 import kotlin.reflect.full.memberProperties
 
 @Throws(IllegalStateException::class)
