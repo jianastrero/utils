@@ -9,6 +9,10 @@ This library contains various utility functions developed and will primarily be 
 by [Jian James Astrero](https://github.com/jianastrero) for use in development projects. The utilities are organized
 into packages for different purposes such as logging, reflection, table formatting, and more.
 
+## Requirements
+
+- Minimum Java Version: `17`
+
 ## Features
 
 ### Logging Utilities
