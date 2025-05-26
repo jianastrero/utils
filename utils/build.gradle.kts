@@ -27,7 +27,7 @@ kover {
 
 val artifactId = "utils"
 group = "io.github.jianastrero"
-version = "1.0.3"
+version = "1.0.4"
 
 kotlin {
     jvm()
