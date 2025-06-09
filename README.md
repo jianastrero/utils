@@ -103,10 +103,38 @@ Utilities for working with reflection across platforms:
 
 ### Other Utilities
 
-- **Number Extensions**: Useful extensions for numeric types
-- **String Formatting**: Functions for formatting strings
+- **Number Extensions**: Useful extensions for numeric types, including `orZero()` for handling null values
+- **String Formatting**: Functions for formatting strings like `padAround()`, `fillAround()`, and `splitLines()`
 - **UUID Generation**: Platform-independent UUID generation
 - **Stack Trace Utilities**: Functions for working with stack traces
+- **Nullity Checking**: `truthy()` extension functions for various types to check for meaningful values
+- **Boolean Extensions**: Utility functions like `isTrue()` for nullable booleans
+
+#### Extension Function Examples
+
+```kotlin
+// String extensions
+"Hello".padAround(10) // Returns "  Hello   " (padded to length 10)
+"Hello".fillAround(2, '-') // Returns "--Hello--" (filled with 2 dashes on each side)
+"Line 1\nLine 2\n\nLine 3".splitLines() // Returns ["Line 1", "Line 2", "Line 3"]
+
+// Number extensions
+val nullableNumber: Int? = null
+nullableNumber.orZero() // Returns 0
+
+// Boolean extensions
+val nullableBoolean: Boolean? = null
+nullableBoolean.isTrue() // Returns false
+nullableBoolean.truthy() // Returns false
+
+// Nullity checking with truthy()
+"".truthy() // Returns true (non-null string)
+null.truthy() // Returns false (null string)
+listOf(1, 2, 3).truthy() // Returns true (non-empty collection)
+emptyList<Int>().truthy() // Returns false (empty collection)
+0.0.truthy() // Returns false (zero number)
+42.truthy() // Returns true (non-zero number)
+```
 
 ## Installation
 
@@ -116,17 +144,17 @@ Add the dependency to your `build.gradle.kts` file:
 
 ```kotlin
 // For all variants
-implementation("io.github.jianastrero:utils:1.0.4")
+implementation("io.github.jianastrero:utils:1.0.5")
 
 // For Debug Only
-debugImplementation("io.github.jianastrero:utils:1.0.4")
+debugImplementation("io.github.jianastrero:utils:1.0.5")
 ```
 
 ### Other platforms
 
 ```kotlin
 dependencies {
-    implementation("io.github.jianastrero:utils:1.0.4")
+    implementation("io.github.jianastrero:utils:1.0.5")
 }
 ```
 
