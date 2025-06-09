@@ -24,3 +24,4 @@ inline fun FloatArray.truthy(): Boolean = isNotEmpty()
 inline fun DoubleArray.truthy(): Boolean = isNotEmpty()
 inline fun ClosedRange<*>.truthy(): Boolean = !isEmpty()
 inline fun OpenEndRange<*>.truthy(): Boolean = !isEmpty()
+inline fun <T> T?.truthy(): Boolean = this != null
